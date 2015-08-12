@@ -1,0 +1,6 @@
+{
+    "require": {
+        "zendframework/zend-uri": "^2.5",
+        "league/uri": "dev-master"
+    },
+}

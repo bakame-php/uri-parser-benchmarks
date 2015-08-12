@@ -1,0 +1,155 @@
+#!/usr/bin/env php
+<?php
+
+error_reporting(-1);
+ini_set('display_errors', '1');
+
+require dirname(__DIR__).'/vendor/autoload.php';
+
+/**
+ * Format the parsing results
+ *
+ * @param array|bool $uriparts the result from the parser function
+ *
+ * @return array
+ */
+function formatResults($uriparts)
+{
+    if (!is_array($uriparts)) {
+        $uriparts = ['parsing failed' => $uriparts];
+    }
+
+    return array_map(function ($value) {
+        if (null === $value) {
+            return chr(27)."[32m null".chr(27)."[0m";
+        }
+
+        if ('' === $value) {
+            return chr(27)."[34m (empty string)".chr(27)."[0m";
+        }
+
+        if (is_bool($value)) {
+            $value = (true === $value) ? 'true' : 'false';
+
+            return chr(27)."[35m ".$value.chr(27)."[0m";
+        }
+
+        return chr(27)."[33m ".$value.chr(27)."[0m";
+    }, $uriparts);
+}
+
+/**
+ * Benchmark League\Uri\UriParser
+ *
+ * @param int $count The number of URI to parse
+ * @param string $uri The URI to parse
+ *
+ * @return float the benchmark duration
+ */
+function benchmarkLeagueUriParser($uri)
+{
+    return formatResults((new League\Uri\UriParser())->parse($uri));
+
+}
+
+/**
+ * Benchmark Zend\Uri\Uri::parse method
+ *
+ * @param int $count The number of URI to parse
+ * @param string $uri The URI to parse
+ *
+ * @return float the benchmark duration
+ */
+function benchmarkZendUriParser($uri)
+{
+    $uriParser = new Zend\Uri\Uri($uri);
+    return formatResults([
+        'scheme' => $uriParser->getScheme(),
+        'userinfo' => $uriParser->getUserInfo(),
+        'host' => $uriParser->getHost(),
+        'port' => $uriParser->getPort(),
+        'path' => $uriParser->getPath(),
+        'query' => $uriParser->getQuery(),
+        'fragment' => $uriParser->getFragment(),
+    ]);
+}
+
+/**
+ * Benchmark PHP's native parse_url functiln
+ *
+ * @param int $count The number of URI to parse
+ * @param string $uri The URI to parse
+ *
+ * @return float the benchmark duration
+ */
+function benchmarkNativeParseUrlFunction($uri)
+{
+    return formatResults(parse_url($uri));
+}
+
+$parserList = [
+    'native' => ['name' => 'parse_url', 'test' => 'benchmarkNativeParseUrlFunction'],
+    'league' => ['name' => 'League\Uri\UriParser', 'test' => 'benchmarkLeagueUriParser'],
+    'zend' => ['name' => 'Zend\Uri\Uri', 'test' => 'benchmarkZendUriParser'],
+];
+
+$opts = filter_var_array(
+    array_replace(
+        ['parser' => 'native', 'uri' => ''],
+        getopt("", ['parser::', 'uri::', 'help'])
+    ),
+    [
+        'parser' => [
+            'filter' => FILTER_VALIDATE_REGEXP,
+            'options' => ['regexp' => '/^(league|native|zend)$/', 'default' => 'native'],
+        ],
+        'uri' => FILTER_UNSAFE_RAW,
+        'help' => FILTER_VALIDATE_BOOLEAN,
+    ]
+);
+
+$yellow = chr(27)."[33m";
+$green  = chr(27)."[32m";
+$cyan   = chr(27)."[36m";
+$reset  = chr(27)."[0m";
+$redbg  = chr(27)."[41m";
+if (isset($opts['help'])) {
+    $script = basename(__FILE__);
+    $text = <<<EOF
+
+This script parse a URI using different URI parsers written in PHP.
+=====
+
+Simple Usage:
+
+$yellow php $script --parser=native --uri=http://example.com $reset
+
+$green--parser$reset    select the parser to be benchmarked: {$green}zend{$reset}, {$green}league{$reset}, {$green}native{$reset} ({$yellow}default:$reset native)
+$green--uri$reset       submit your own uri ({$yellow}default:$reset internal uri given)
+$green--help$reset      show the following help message
+EOF;
+    echo $text, PHP_EOL;
+    die(0);
+}
+
+$uri = 'http://cnn.example.com&story=breaking_news:pass@10.0.0.1/top_story.htm?q=v&q=b#~toto';
+if (isset($opts['uri']) && !empty($opts['uri'])) {
+    $uri = $opts['uri'];
+}
+
+echo PHP_EOL."Results from parsing ".$yellow.$uri.$reset.PHP_EOL;
+$parser = $parserList[$opts['parser']];
+$res = ['memory' => [], 'duration' => []];
+echo "Using  ".$green.$parser['name'].$reset.PHP_EOL;
+$method = $parser['test'];
+try {
+    print_r($method($uri));
+} catch (Exception $e) {
+    $text = <<<EOF
+
+The submitted uri $yellow{$uri}$reset could not be parse by $green{$parser['name']}$reset
+The Parser issue the following error: $redbg {$e->getMessage()} $reset
+EOF;
+    echo $text, PHP_EOL;
+}
+die(0);
