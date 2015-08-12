@@ -41,7 +41,7 @@ $ composer install
 Scripts
 -------
 
-There's two script in the package:
+There's two script in the package `bin` directory:
 
 ### Parsing capabilities
 
