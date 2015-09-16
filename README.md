@@ -32,6 +32,10 @@ And of course
 
 - [parse_url](http://php.net/parse_url)
 
+All URI Parser packages are managed by composer. The tests are runned with the latest stable version
+
+[**See the latest benchmark on Travis-CI**](https://travis-ci.org/nyamsprod/ur-parser-benchmarks)
+
 System Requirements
 -------
 
