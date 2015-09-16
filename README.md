@@ -91,7 +91,7 @@ The above benchmark will use the `Zend\Uri\Uri` parsing capabilities and the sub
 For more options you can issue the following command to display the script help message:
 
 ``` bash
-$ php parser.php --help
+$ php bin/benchmark --help
 ```
 
 Contributing

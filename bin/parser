@@ -190,17 +190,20 @@ if (isset($opts['uri']) && !empty($opts['uri'])) {
 
 echo PHP_EOL."Results from parsing ".$yellow.$uri.$reset.PHP_EOL;
 $parser = $parserList[$opts['parser']];
-$res = ['memory' => [], 'duration' => []];
 echo "Using  ".$green.$parser['name'].$reset.PHP_EOL;
 $method = $parser['test'];
 try {
     print_r($method($uri));
+    die(0);
 } catch (Exception $e) {
     $text = <<<EOF
 
 The submitted uri $yellow{$uri}$reset could not be parse by $green{$parser['name']}$reset
-The Parser issue the following error: $redbg {$e->getMessage()} $reset
+The Parser issue the following error: 
+
+$redbg {$e->getMessage()} $reset
+
 EOF;
     echo $text, PHP_EOL;
+    die(65);
 }
-die(0);
