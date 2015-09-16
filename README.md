@@ -4,11 +4,16 @@ URI parser benchmark
 Motivation
 -------
 
-While developing [League URI](https://github.com/thephpleague/uri/) version 4, I needed to replace PHP `parse_url` function with a userland version which is more RFC3986 compliant.
+While developing [League URI](https://github.com/thephpleague/uri/) version 4, the need for replacing PHP `parse_url` function with a userland version which is more RFC3986 compliant was obvious.
 
-This benchmark is only there to test the resulting code overhead (speed + memory usage).
+This package sole purpose is to:
 
-This is a work in progress. Feel free to update and improve the tests. It will help everyone get a real interoperable `UriInterface`.
+- compare different PHP userland parser against any submitted URI.
+- test the resulting code overhead (speed + memory usage) vs PHP's `parse_url` function.
+
+This is a work in progress. Feel free to update or improve the tests. It will help everyone get better compliant RFC3986 URI parser.
+
+**Of note: we are only testing URI parser NOT URI validation which is a different topic**.
 
 Tested implementations
 -------
@@ -19,6 +24,9 @@ This package run the tests against the following implementations (order alphabet
 - [League URI](https://github.com/thephpleague/uri/) (version 4.x)
 - [Pear::Net_URL2](https://github.com/pear/Net_URL2)
 - [Zend URI](https://github.com/zendframework/zend-uri)
+
+And of course
+
 - [parse_url](http://php.net/parse_url)
 
 System Requirements
@@ -48,38 +56,39 @@ There's two scripts in the package `bin` directory:
 
 The `parser.php` script returns the results from parsing a given URI with one of the available parser.
 
+In the root directory run the following command:
+
 ``` bash
-$ php parser.php --parser=league --uri="scheme://host:/path?#fragment"
+$ php bin/parser --parser=league --uri="scheme://host:/path?#fragment"
 ```
 
 The above command will output the result from parsing the given URI with the `League\Uri\UriParser` class.
 
-You can of course change the parser by providing the parser name.
+You can of course change the parser by providing the parser "nickname".
 
-- native : `parse_url`
-- league : `League\Uri\UriParser`
-- pear   : `Net_URL2` 
-- zend   : `Zend\Uri\Uri`
-- riimu  : `Riimu\Kit\UrlParser\UriParser`
+- *native* : `parse_url`
+- *league* : `League\Uri\UriParser`
+- *pear*   : `Net_URL2` 
+- *zend*   : `Zend\Uri\Uri`
+- *riimu*  : `Riimu\Kit\UrlParser\UriParser`
 
 For more options you can issue the following command to display the script help message:
 
 ``` bash
-$ php parser.php --help
+$ php bin/parser --help
 ```
 
 ### Overhead capabilities
 
-The `benchmark.php` script runs the benchmark against one implementation with a given URI.
+The `benchmark` script runs the benchmark against one implementation with a given URI.
 
 ``` bash
-$ php benchmark.php --parser=zend --uri="scheme://host:/path?#fragment"
+$ php bin/benchmark --parser=zend --uri="scheme://host:/path?#fragment"
 ```
 
 The above benchmark will use the `Zend\Uri\Uri` parsing capabilities and the submitted URI will be parsed 100 times with 3 iterations.
 
 For more options you can issue the following command to display the script help message:
-
 
 ``` bash
 $ php parser.php --help
@@ -94,7 +103,7 @@ Credits
 -------
 
 - [ignace nyamagana butera](https://github.com/nyamsprod)
-- [All Contributors](https://github.com/nyamsprod/psr7-uri-interface-test-suite/contributors)
+- [All Contributors](https://github.com/nyamsprod/uri-parser-benchmarks/contributors)
 
 License
 -------

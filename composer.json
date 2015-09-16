@@ -1,4 +1,17 @@
 {
+    "name" : "nyamsprod/uri-parser-benchmarks",
+    "description" : "compare and benchmark PHP URI parser libraries",
+    "keywords": ["uri", "url", "parser", "benchmark", "rfc3986", "parse_url"],
+    "license" : "MIT",
+    "homepage" : "https://github.com/nyamsprod/uri-parser-benchmarks",
+    "authors" : [
+        {
+            "name" : "Ignace Nyamagana Butera",
+            "email" : "nyamsprod@gmail.com",
+            "homepage": "https://github.com/nyamsprod",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "zendframework/zend-uri": "^2.5",
         "league/uri": "dev-master",
