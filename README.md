@@ -1,6 +1,9 @@
 URI parser benchmark
 =======
 
+[![Build Status](https://travis-ci.org/nyamsprod/uri-parser-benchmarks.svg?branch=master)](https://travis-ci.org/nyamsprod/uri-parser-benchmarks)
+[![Latest Version](https://img.shields.io/github/release/nyamsprod/uri-parser-benchmarks.svg?style=flat-square)](https://github.com/nyamsprod/uri-parser-benchmarks/releases)
+
 Motivation
 -------
 
