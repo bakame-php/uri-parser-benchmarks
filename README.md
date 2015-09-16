@@ -2,7 +2,6 @@ URI parser benchmark
 =======
 
 [![Build Status](https://travis-ci.org/nyamsprod/uri-parser-benchmarks.svg?branch=master)](https://travis-ci.org/nyamsprod/uri-parser-benchmarks)
-[![Latest Version](https://img.shields.io/github/release/nyamsprod/uri-parser-benchmarks.svg?style=flat-square)](https://github.com/nyamsprod/uri-parser-benchmarks/releases)
 
 Motivation
 -------
@@ -16,7 +15,7 @@ This package sole purpose is to:
 
 This is a work in progress. Feel free to update or improve the tests. It will help everyone get better compliant RFC3986 URI parser.
 
-**Of note: we are only testing URI parser NOT URI validation which is a different topic**.
+**Of note: we are only testing URI parsing capabilities NOT URI validation which is a whole different topic**.
 
 Tested implementations
 -------
@@ -48,9 +47,9 @@ You need:
 Install
 -------
 
-Clone this repo on a composer installed box and run the following command from the project folder.
+Clone this repo on a composer installed box and run the following command from the project root folder.
 
-``` bash
+```bash
 $ composer install
 ```
 
@@ -61,12 +60,18 @@ There's two scripts in the package `bin` directory:
 
 ### Parsing capabilities
 
-The `parser.php` script returns the results from parsing a given URI with one of the available parser.
+The `parser` script returns the results from parsing a given URI with one of the available parser.
 
 In the root directory run the following command:
 
-``` bash
+```bash
 $ php bin/parser --parser=league --uri="scheme://host:/path?#fragment"
+```
+
+By default if no URI is provided, the following URI will be used:
+
+```php
+$uri = 'ftp://cnn.example.com&story=breaking_news:pass@10.0.0.1/top_story.htm?q=v&q=b#~toto';
 ```
 
 The above command will output the result from parsing the given URI with the `League\Uri\UriParser` class.
@@ -81,7 +86,7 @@ You can of course change the parser by providing the parser "nickname".
 
 For more options you can issue the following command to display the script help message:
 
-``` bash
+```bash
 $ php bin/parser --help
 ```
 
@@ -89,7 +94,7 @@ $ php bin/parser --help
 
 The `benchmark` script runs the benchmark against one implementation with a given URI.
 
-``` bash
+```bash
 $ php bin/benchmark --parser=zend --uri="scheme://host:/path?#fragment"
 ```
 
@@ -97,7 +102,7 @@ The above benchmark will use the `Zend\Uri\Uri` parsing capabilities and the sub
 
 For more options you can issue the following command to display the script help message:
 
-``` bash
+```bash
 $ php bin/benchmark --help
 ```
 

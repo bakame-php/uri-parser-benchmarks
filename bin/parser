@@ -183,7 +183,7 @@ EOF;
     die(0);
 }
 
-$uri = 'http://cnn.example.com&story=breaking_news:pass@10.0.0.1/top_story.htm?q=v&q=b#~toto';
+$uri = 'ftp://cnn.example.com&story=breaking_news:pass@10.0.0.1/top_story.htm?q=v&q=b#~toto';
 if (isset($opts['uri']) && !empty($opts['uri'])) {
     $uri = $opts['uri'];
 }
