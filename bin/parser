@@ -62,15 +62,35 @@ function benchmarkLeagueUriParser($uri)
  */
 function benchmarkZendUriParser($uri)
 {
-    $uriParser = new Zend\Uri\Uri($uri);
+    $uri = new Zend\Uri\Uri($uri);
     return formatResults([
-        'scheme' => $uriParser->getScheme(),
-        'userinfo' => $uriParser->getUserInfo(),
-        'host' => $uriParser->getHost(),
-        'port' => $uriParser->getPort(),
-        'path' => $uriParser->getPath(),
-        'query' => $uriParser->getQuery(),
-        'fragment' => $uriParser->getFragment(),
+        'scheme' => $uri->getScheme(),
+        'userinfo' => $uri->getUserInfo(),
+        'host' => $uri->getHost(),
+        'port' => $uri->getPort(),
+        'path' => $uri->getPath(),
+        'query' => $uri->getQuery(),
+        'fragment' => $uri->getFragment(),
+    ]);
+}
+
+function benchmarkRiimuUrlParser($uri)
+{
+    $uriParser = new Riimu\Kit\UrlParser\UriParser($uri);
+    $uriParser->setMode(Riimu\Kit\UrlParser\UriParser::MODE_IDNA2003);
+    $uri = $uriParser->parse($uri);
+    if (null === $uri) {
+        throw new RuntimeException('`Riimu\Kit\UrlParser\UriParser::parse` returns `null`');
+    }
+
+    return formatResults([
+        'scheme' => $uri->getScheme(),
+        'userinfo' => $uri->getUserInfo(),
+        'host' => $uri->getHost(),
+        'port' => $uri->getPort(),
+        'path' => $uri->getPath(),
+        'query' => $uri->getQuery(),
+        'fragment' => $uri->getFragment(),
     ]);
 }
 
@@ -91,6 +111,7 @@ $parserList = [
     'native' => ['name' => 'parse_url', 'test' => 'benchmarkNativeParseUrlFunction'],
     'league' => ['name' => 'League\Uri\UriParser', 'test' => 'benchmarkLeagueUriParser'],
     'zend' => ['name' => 'Zend\Uri\Uri', 'test' => 'benchmarkZendUriParser'],
+    'riimu' => ['name' => 'Riimu\Kit\UrlParser\UriParser', 'test' => 'benchmarkRiimuUrlParser'],
 ];
 
 $opts = filter_var_array(
@@ -101,7 +122,10 @@ $opts = filter_var_array(
     [
         'parser' => [
             'filter' => FILTER_VALIDATE_REGEXP,
-            'options' => ['regexp' => '/^(league|native|zend)$/', 'default' => 'native'],
+            'options' => [
+                'regexp' => '/^(league|native|zend|riimu)$/',
+                'default' => 'native'
+            ],
         ],
         'uri' => FILTER_UNSAFE_RAW,
         'help' => FILTER_VALIDATE_BOOLEAN,

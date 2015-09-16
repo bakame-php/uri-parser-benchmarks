@@ -15,10 +15,10 @@ Tested implementations
 
 This package run the tests against the following implementations (order alphabetically):
 
+- [Kit-UrlParser](https://github.com/Riimu/Kit-UrlParser)
 - [League URI](https://github.com/thephpleague/uri/) (version 4.x)
 - [Zend URI](https://github.com/zendframework/zend-uri)
 - [parse_url](http://php.net/parse_url)
-
 
 System Requirements
 -------
@@ -55,9 +55,10 @@ The above command will output the result from parsing the given URI with the `Le
 
 You can of course change the parser by providing the parser name.
 
+- native : `parse_url`
 - league : `League\Uri\UriParser`
 - zend   : `Zend\Uri\Uri`
-- native : `parse_url`
+- riimu  : `Riimu\Kit\UrlParser\UriParser`
 
 For more options you can issue the following command to display the script help message:
 
@@ -73,8 +74,7 @@ The `benchmark.php` script runs the benchmark against one implementation with a 
 $ php benchmark.php --parser=zend --uri="scheme://host:/path?#fragment"
 ```
 
-The above benchmark will use the `Zend\Uri\Uri` parsing capabilities and the submitted URI will be parsed
-100 times with 3 iterations.
+The above benchmark will use the `Zend\Uri\Uri` parsing capabilities and the submitted URI will be parsed 100 times with 3 iterations.
 
 For more options you can issue the following command to display the script help message:
 

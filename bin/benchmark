@@ -83,6 +83,30 @@ function benchmarkZendUriParser($count, $uri)
 }
 
 /**
+ * Benchmark Riimu\Kit\UrlParser\UriParser::parse method
+ *
+ * @param int $count The number of URI to parse
+ * @param string $uri The URI to parse
+ *
+ * @return float the benchmark duration
+ */
+function benchmarkRiimuUriParser($count, $uri)
+{
+    $start = microtime(true);
+    $memory = memory_get_usage();
+    $uriParser = new Riimu\Kit\UrlParser\UriParser();
+    $uriParser->setMode(Riimu\Kit\UrlParser\UriParser::MODE_IDNA2003);
+    foreach (generateUri($count, $uri) as $url) {
+        $uriParser->parse($url);
+    }
+
+    return [
+        'memory' => memory_get_usage() - $memory,
+        'duration' => microtime(true) - $start,
+    ];
+}
+
+/**
  * Benchmark PHP's native parse_url functiln
  *
  * @param int $count The number of URI to parse
@@ -108,6 +132,7 @@ $parserList = [
     'native' => ['name' => 'parse_url', 'test' => 'benchmarkNativeParseUrlFunction'],
     'league' => ['name' => 'League\Uri\UriParser', 'test' => 'benchmarkLeagueUriParser'],
     'zend' => ['name' => 'Zend\Uri\Uri', 'test' => 'benchmarkZendUriParser'],
+    'riimu' => ['name' => 'Riimu\Kit\UrlParser\UriParser', 'test' => 'benchmarkRiimuUriParser'],
 ];
 
 $opts = filter_var_array(
@@ -118,7 +143,7 @@ $opts = filter_var_array(
     [
         'parser' => [
             'filter' => FILTER_VALIDATE_REGEXP,
-            'options' => ['regexp' => '/^(league|native|zend)$/', 'default' => 'native'],
+            'options' => ['regexp' => '/^(league|native|zend|riimu)$/', 'default' => 'native'],
             ],
         'nb' => [
             'filter' => FILTER_VALIDATE_INT,
