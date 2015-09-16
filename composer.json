@@ -2,6 +2,7 @@
     "require": {
         "zendframework/zend-uri": "^2.5",
         "league/uri": "dev-master",
-        "riimu/kit-urlparser": "^2.0"
+        "riimu/kit-urlparser": "^2.0",
+        "pear/net_url2": "^2.2"
     }
 }

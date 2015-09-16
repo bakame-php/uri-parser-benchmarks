@@ -39,28 +39,48 @@ function formatResults($uriparts)
 }
 
 /**
- * Benchmark League\Uri\UriParser
+ * Parsing using League\Uri\UriParser class
  *
- * @param int $count The number of URI to parse
  * @param string $uri The URI to parse
  *
- * @return float the benchmark duration
+ * @return array
  */
-function benchmarkLeagueUriParser($uri)
+function testLeagueUriParser($uri)
 {
     return formatResults((new League\Uri\UriParser())->parse($uri));
 
 }
 
 /**
- * Benchmark Zend\Uri\Uri::parse method
+ * Parsing using Pear Net_URL2 class
  *
- * @param int $count The number of URI to parse
  * @param string $uri The URI to parse
  *
- * @return float the benchmark duration
+ * @return array
  */
-function benchmarkZendUriParser($uri)
+function testPearParser($uri)
+{
+    $uri = new Net_URL2($uri);
+    return formatResults([
+        'scheme' => $uri->getScheme(),
+        'user' => $uri->getUser(),
+        'pass' => $uri->getPassword(),
+        'host' => $uri->getHost(),
+        'port' => $uri->getPort(),
+        'path' => $uri->getPath(),
+        'query' => $uri->getQuery(),
+        'fragment' => $uri->getFragment(),
+    ]);
+}
+
+/**
+ * Parsing using Zend\Uri\Uri class
+ *
+ * @param string $uri The URI to parse
+ *
+ * @return array
+ */
+function testZendUriParser($uri)
 {
     $uri = new Zend\Uri\Uri($uri);
     return formatResults([
@@ -74,9 +94,16 @@ function benchmarkZendUriParser($uri)
     ]);
 }
 
-function benchmarkRiimuUrlParser($uri)
+/**
+ * Parsing using Riimu\Kit\UrlParser\UriParser class
+ *
+ * @param string $uri The URI to parse
+ *
+ * @return array
+ */
+function testRiimuUrlParser($uri)
 {
-    $uriParser = new Riimu\Kit\UrlParser\UriParser($uri);
+    $uriParser = new Riimu\Kit\UrlParser\UriParser();
     $uriParser->setMode(Riimu\Kit\UrlParser\UriParser::MODE_IDNA2003);
     $uri = $uriParser->parse($uri);
     if (null === $uri) {
@@ -95,23 +122,23 @@ function benchmarkRiimuUrlParser($uri)
 }
 
 /**
- * Benchmark PHP's native parse_url functiln
+ * Parsing using PHP's native parse_url function
  *
- * @param int $count The number of URI to parse
  * @param string $uri The URI to parse
  *
- * @return float the benchmark duration
+ * @return array
  */
-function benchmarkNativeParseUrlFunction($uri)
+function testNativeParseUrlFunction($uri)
 {
     return formatResults(parse_url($uri));
 }
 
 $parserList = [
-    'native' => ['name' => 'parse_url', 'test' => 'benchmarkNativeParseUrlFunction'],
-    'league' => ['name' => 'League\Uri\UriParser', 'test' => 'benchmarkLeagueUriParser'],
-    'zend' => ['name' => 'Zend\Uri\Uri', 'test' => 'benchmarkZendUriParser'],
-    'riimu' => ['name' => 'Riimu\Kit\UrlParser\UriParser', 'test' => 'benchmarkRiimuUrlParser'],
+    'native' => ['name' => 'parse_url', 'test' => 'testNativeParseUrlFunction'],
+    'league' => ['name' => 'League\Uri\UriParser', 'test' => 'testLeagueUriParser'],
+    'zend' => ['name' => 'Zend\Uri\Uri', 'test' => 'testZendUriParser'],
+    'pear' => ['name' => 'Net_URL2', 'test' => 'testPearParser'],
+    'riimu' => ['name' => 'Riimu\Kit\UrlParser\UriParser', 'test' => 'testRiimuUrlParser'],
 ];
 
 $opts = filter_var_array(
@@ -123,7 +150,7 @@ $opts = filter_var_array(
         'parser' => [
             'filter' => FILTER_VALIDATE_REGEXP,
             'options' => [
-                'regexp' => '/^(league|native|zend|riimu)$/',
+                'regexp' => '/^(league|native|zend|riimu|pear)$/',
                 'default' => 'native'
             ],
         ],
@@ -148,9 +175,9 @@ Simple Usage:
 
 $yellow php $script --parser=native --uri=http://example.com $reset
 
-$green--parser$reset    select the parser to be benchmarked: {$green}zend{$reset}, {$green}league{$reset}, {$green}native{$reset} ({$yellow}default:$reset native)
-$green--uri$reset       submit your own uri ({$yellow}default:$reset internal uri given)
-$green--help$reset      show the following help message
+$green--parser$reset select the parser to be use: {$green}pear{$reset}, {$green}riimu{$reset}, {$green}zend{$reset}, {$green}league{$reset}, {$green}native{$reset} ({$yellow}default:$reset native)
+$green--uri$reset    submit your own uri ({$yellow}default:$reset internal uri given)
+$green--help$reset   show the following help message
 EOF;
     echo $text, PHP_EOL;
     die(0);

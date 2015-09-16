@@ -83,7 +83,29 @@ function benchmarkZendUriParser($count, $uri)
 }
 
 /**
- * Benchmark Riimu\Kit\UrlParser\UriParser::parse method
+ * Benchmark Pear parser
+ *
+ * @param int $count The number of URI to parse
+ * @param string $uri The URI to parse
+ *
+ * @return float the benchmark duration
+ */
+function benchmarkPearUriParser($count, $uri)
+{
+    $start = microtime(true);
+    $memory = memory_get_usage();
+    foreach (generateUri($count, $uri) as $url) {
+        new Net_URL2($url);
+    }
+
+    return [
+        'memory' => memory_get_usage() - $memory,
+        'duration' => microtime(true) - $start,
+    ];
+}
+
+/**
+ * Benchmark Riimu\Kit\UrlParser\UriParser
  *
  * @param int $count The number of URI to parse
  * @param string $uri The URI to parse
@@ -132,6 +154,7 @@ $parserList = [
     'native' => ['name' => 'parse_url', 'test' => 'benchmarkNativeParseUrlFunction'],
     'league' => ['name' => 'League\Uri\UriParser', 'test' => 'benchmarkLeagueUriParser'],
     'zend' => ['name' => 'Zend\Uri\Uri', 'test' => 'benchmarkZendUriParser'],
+    'pear' => ['name' => 'Net_URL2', 'test' => 'benchmarkPearUriParser'],
     'riimu' => ['name' => 'Riimu\Kit\UrlParser\UriParser', 'test' => 'benchmarkRiimuUriParser'],
 ];
 
@@ -143,7 +166,7 @@ $opts = filter_var_array(
     [
         'parser' => [
             'filter' => FILTER_VALIDATE_REGEXP,
-            'options' => ['regexp' => '/^(league|native|zend|riimu)$/', 'default' => 'native'],
+            'options' => ['regexp' => '/^(league|native|zend|pear|riimu)$/', 'default' => 'native'],
             ],
         'nb' => [
             'filter' => FILTER_VALIDATE_INT,
@@ -175,7 +198,7 @@ Simple Usage:
 
 $yellow php $script --parser=zend --iteration=3 --nb=1000 --uri=http://example.com $reset
 
-$green--parser$reset    select the parser to be benchmarked: {$green}zend{$reset}, {$green}league{$reset}, {$green}native{$reset} ({$yellow}default:$reset native)
+$green--parser$reset    select the parser to be benchmarked: {$green}pear{$reset}, {$green}riimu{$reset}, {$green}zend{$reset}, {$green}league{$reset}, {$green}native{$reset} ({$yellow}default:$reset native)
 $green--iteration$reset select the number of iteration ({$yellow}default:$reset 3)
 $green--uri$reset       submit your own uri ({$yellow}default:$reset internal uri given)
 $green--nb$reset        submit the number of time the uri must be parse ({$yellow}default:$reset 100)
