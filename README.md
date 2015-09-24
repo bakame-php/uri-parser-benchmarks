@@ -6,7 +6,7 @@ URI parser benchmark
 Motivation
 -------
 
-While developing [League URI](https://github.com/thephpleague/uri/) version 4, the need for replacing PHP `parse_url` function with a userland version which is more RFC3986 compliant was obvious.
+While developing [League URL](https://github.com/thephpleague/uri/) version 4, the need for replacing PHP `parse_url` function with a userland version which is more RFC3986 compliant was obvious.
 
 This package sole purpose is to:
 
@@ -23,7 +23,7 @@ Tested implementations
 This package run the tests against the following implementations (order alphabetically):
 
 - [Kit-UrlParser](https://github.com/Riimu/Kit-UrlParser)
-- [League URI](https://github.com/thephpleague/uri/) (version 4.x)
+- [League URL](https://github.com/thephpleague/uri/)
 - [Pear::Net_URL2](https://github.com/pear/Net_URL2)
 - [Zend URI](https://github.com/zendframework/zend-uri)
 
