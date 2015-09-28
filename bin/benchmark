@@ -14,9 +14,15 @@ require __DIR__.'/common.php';
  */
 function convert($size)
 {
-    return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2)
-        .' '
-        .['b','kb','mb','gb','tb','pb'][$i];
+    $offset = log($size, 1024);
+    $offset = floor($offset);
+    $div = pow(1024, $offset);
+    $unitList = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
+    if (!array_key_exists($offset, $unitList)) {
+        return $size.' b';
+    }
+
+    return round($size / $div, 2).' '.$unitList[$offset];
 }
 
 $opts = filter_var_array(
