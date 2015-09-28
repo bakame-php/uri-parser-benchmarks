@@ -36,7 +36,7 @@ class League extends AbstractDriver
      */
     public function getParserName()
     {
-        return 'League\Uri\Parser';
+        return UriParser::class;
     }
 
     /**

@@ -36,7 +36,7 @@ class Pear extends AbstractDriver
      */
     public function getParserName()
     {
-        return 'Net_URL2';
+        return Net_URL2::class;
     }
 
     /**

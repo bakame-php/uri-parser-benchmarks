@@ -4,21 +4,16 @@
 require __DIR__.'/common.php';
 
 $opts = filter_var_array(
-    array_replace(
-        [
-            'parser' => 'native',
-            'uri' => ''
-        ],
-        getopt("", ['parser::', 'uri::', 'help'])
-    ),
-    [
-        'parser' => $drivers->collectionFilter(),
-        'uri' => FILTER_UNSAFE_RAW,
-        'help' => FILTER_VALIDATE_BOOLEAN,
-    ]
+    array_replace(['parser' => 'native', 'uri' => ''], getopt("", ['parser::', 'uri::', 'help'])),
+    ['parser' => $drivers->collectionFilter(), 'uri' => FILTER_UNSAFE_RAW, 'help' => FILTER_VALIDATE_BOOLEAN]
 );
 
 if (isset($opts['help'])) {
+    $list = [];
+    foreach ($drivers as $name => $obj) {
+        $list[] = $green.$name.$reset;
+    }
+    $parserList = implode(', ', $list);
     $script = basename(__FILE__);
     $text = <<<EOF
 
@@ -29,7 +24,7 @@ Simple Usage:
 
 $yellow php $script --parser=native --uri=http://example.com $reset
 
-$green--parser$reset select the parser to be use: {$green}pear{$reset}, {$green}riimu{$reset}, {$green}zend{$reset}, {$green}league{$reset}, {$green}native{$reset} ({$yellow}default:{$reset} native)
+$green--parser$reset select the parser to be use: $parserList ({$yellow}default:{$reset} native)
 $green--uri$reset    submit your own uri ({$yellow}default:{$reset} $uri)
 $green--help$reset   show the following help message
 EOF;

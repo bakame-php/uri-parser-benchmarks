@@ -36,7 +36,7 @@ class Zend extends AbstractDriver
      */
     public function getParserName()
     {
-        return 'Zend\Uri\Uri';
+        return Uri::class;
     }
 
     /**

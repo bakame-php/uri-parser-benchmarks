@@ -8,16 +8,15 @@ require __DIR__.'/common.php';
  *
  * @see http://php.net/manual/en/function.memory-get-usage.php#96280
  *
- * @param  int $size
+ * @param int $size
  *
  * @return string
  */
 function convert($size)
 {
-    $offset = log($size, 1024);
-    $offset = floor($offset);
+    $offset = (int) floor(log($size, 1024));
     $unitList = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
-    if (!is_string($offset) || !is_int($offset) || !array_key_exists($offset, $unitList)) {
+    if (!array_key_exists($offset, $unitList)) {
         return $size.' b';
     }
 
@@ -26,30 +25,24 @@ function convert($size)
 
 $opts = filter_var_array(
     array_replace(
-        [
-            'parser' => 'native',
-            'uri' => '',
-            'nb' => 100,
-            'iteration' => 3,
-        ],
+        ['parser' => 'native', 'uri' => '', 'nb' => 100, 'iteration' => 3],
         getopt("", ['parser::', 'nb::', 'iteration::', 'uri::', 'help'])
     ),
     [
         'parser' => $drivers->collectionFilter(),
         'uri' => FILTER_UNSAFE_RAW,
-        'nb' => [
-            'filter' => FILTER_VALIDATE_INT,
-            'options' => ['min_range' => 1, 'default' => 100],
-        ],
-        'iteration' => [
-            'filter' => FILTER_VALIDATE_INT,
-            'options' => ['min_range' => 1, 'max_range' => 10, 'default' => 3],
-        ],
+        'nb' => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_range' => 1, 'default' => 100]],
+        'iteration' => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_range' => 1, 'max_range' => 10, 'default' => 3]],
         'help' => FILTER_VALIDATE_BOOLEAN,
     ]
 );
 
 if (isset($opts['help'])) {
+    $list = [];
+    foreach ($drivers as $name => $obj) {
+        $list[] = $green.$name.$reset;
+    }
+    $parserList = implode(', ', $list);
     $script = basename(__FILE__);
     $text = <<<EOF
 
@@ -61,7 +54,7 @@ Simple Usage:
 
 $yellow php $script --parser=zend --iteration=3 --nb=1000 --uri=http://example.com $reset
 
-$green--parser$reset    select the parser to be benchmarked: {$green}pear{$reset}, {$green}riimu{$reset}, {$green}zend{$reset}, {$green}league{$reset}, {$green}native{$reset} ({$yellow}default:$reset native)
+$green--parser$reset    select the parser to be benchmarked: $parserList ({$yellow}default:$reset native)
 $green--uri$reset       submit your own uri ({$yellow}default:$reset $uri)
 $green--iteration$reset select the number of iteration ({$yellow}default:$reset 3)
 $green--nb$reset        submit the number of time the uri must be parse ({$yellow}default:$reset 100)
@@ -77,8 +70,8 @@ if (isset($opts['uri']) && !empty($opts['uri'])) {
 
 $parser = $drivers->get($opts['parser']);
 
-$res = ['memory' => [], 'duration' => []];
 try {
+    $res = ['memory' => [], 'duration' => []];
     for ($i = 0; $i < $opts['iteration']; ++$i) {
         $test = $parser->benchmark($opts['nb'], $uri);
         $res['memory'][$i] = $test['memory'];

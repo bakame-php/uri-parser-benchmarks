@@ -13,6 +13,7 @@ namespace UriParsers\Benchmarks;
 
 use ArrayIterator;
 use Countable;
+use FilesystemIterator;
 use InvalidArgumentException;
 use IteratorAggregate;
 
@@ -30,6 +31,25 @@ class DriverCollection implements Countable, IteratorAggregate
      * @var AbstractDriver[]
      */
     private $drivers = [];
+
+    /**
+     * Create From a Directory
+     *
+     * @param  string $namespace The namespace attach to the directory
+     * @param  string $directory The directory path
+     *
+     * @return static
+     */
+    static public function createFromFileSystem($namespace, $directory)
+    {
+        $collection = new static;
+        foreach (new FilesystemIterator($directory) as $fileInfo) {
+            $className = $namespace.'\\'.$fileInfo->getBasename('.php');
+            $collection->add(new $className());
+        }
+
+        return $collection;
+    }
 
     /**
      * IteratorAggregate interface
@@ -65,6 +85,7 @@ class DriverCollection implements Countable, IteratorAggregate
         }
 
         $this->drivers[$driver->getName()] = $driver;
+        ksort($this->drivers);
     }
 
     /**

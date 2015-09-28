@@ -12,21 +12,19 @@ require dirname(__DIR__).'/vendor/autoload.php';
  *
  * @var DriverCollection
  */
-$drivers = new DriverCollection();
-$drivers->add(new UriParsers\Benchmarks\Drivers\League());
-$drivers->add(new UriParsers\Benchmarks\Drivers\Native());
-$drivers->add(new UriParsers\Benchmarks\Drivers\Pear());
-$drivers->add(new UriParsers\Benchmarks\Drivers\Riimu());
-$drivers->add(new UriParsers\Benchmarks\Drivers\Zend());
+$drivers = DriverCollection::createFromFileSystem(
+    'UriParsers\Benchmarks\Drivers',
+    dirname(__DIR__).'/src/Drivers'
+);
 
 /**
  * CLI colors
  */
+$cyan = chr(27)."[36m";
+$green = chr(27)."[32m";
+$reset = chr(27)."[0m";
+$redbg = chr(27)."[41m";
 $yellow = chr(27)."[33m";
-$green  = chr(27)."[32m";
-$cyan   = chr(27)."[36m";
-$reset  = chr(27)."[0m";
-$redbg  = chr(27)."[41m";
 
 /**
  * Default URI

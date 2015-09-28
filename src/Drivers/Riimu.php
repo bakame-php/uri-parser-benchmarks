@@ -37,7 +37,7 @@ class Riimu extends AbstractDriver
      */
     public function getParserName()
     {
-        return 'Riimu\Kit\UrlParser\UriParser';
+        return UriParser::class;
     }
 
     /**
