@@ -16,13 +16,12 @@ function convert($size)
 {
     $offset = log($size, 1024);
     $offset = floor($offset);
-    $div = pow(1024, $offset);
     $unitList = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
-    if (!array_key_exists($offset, $unitList)) {
+    if (!is_string($offset) || !is_int($offset) || !array_key_exists($offset, $unitList)) {
         return $size.' b';
     }
 
-    return round($size / $div, 2).' '.$unitList[$offset];
+    return round($size / pow(1024, $offset), 2).' '.$unitList[$offset];
 }
 
 $opts = filter_var_array(
@@ -100,6 +99,7 @@ $minDuration = min($res['duration']);
 $avgMemory = array_sum($res['memory']) / $opts['iteration'];
 $maxMemory = max($res['memory']);
 $minMemory = min($res['memory']);
+
 echo PHP_EOL
     ." $yellow----------------------------$reset ".PHP_EOL
     ." $yellow|$reset ".$green.$parser->getParserName().$reset.' parser benchmark'.PHP_EOL
