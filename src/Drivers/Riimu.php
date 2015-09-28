@@ -47,7 +47,7 @@ class Riimu extends AbstractDriver
     {
         $start = microtime(true);
         $memory = memory_get_usage();
-        $uriParser = new Riimu\Kit\UrlParser\UriParser();
+        $uriParser = new UriParser();
         $uriParser->setMode(UriParser::MODE_IDNA2003);
         foreach ($this->generateUri($count, $uri) as $url) {
             $uriParser->parse($url);
