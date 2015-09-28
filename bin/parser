@@ -1,169 +1,23 @@
 #!/usr/bin/env php
 <?php
 
-error_reporting(-1);
-ini_set('display_errors', '1');
-
-require dirname(__DIR__).'/vendor/autoload.php';
-
-/**
- * Format the parsing results
- *
- * @param array|bool $uriparts the result from the parser function
- *
- * @return array
- */
-function formatResults($uriparts)
-{
-    if (!is_array($uriparts)) {
-        $uriparts = ['parsing failed' => $uriparts];
-    }
-
-    return array_map(function ($value) {
-        if (null === $value) {
-            return chr(27)."[32m null".chr(27)."[0m";
-        }
-
-        if ('' === $value) {
-            return chr(27)."[34m (empty string)".chr(27)."[0m";
-        }
-
-        if (is_bool($value)) {
-            $value = (true === $value) ? 'true' : 'false';
-
-            return chr(27)."[35m ".$value.chr(27)."[0m";
-        }
-
-        return chr(27)."[33m ".$value.chr(27)."[0m";
-    }, $uriparts);
-}
-
-/**
- * Parsing using League\Uri\UriParser class
- *
- * @param string $uri The URI to parse
- *
- * @return array
- */
-function testLeagueUriParser($uri)
-{
-    return formatResults((new League\Uri\UriParser())->parse($uri));
-
-}
-
-/**
- * Parsing using Pear Net_URL2 class
- *
- * @param string $uri The URI to parse
- *
- * @return array
- */
-function testPearParser($uri)
-{
-    $uri = new Net_URL2($uri);
-    return formatResults([
-        'scheme' => $uri->getScheme(),
-        'user' => $uri->getUser(),
-        'pass' => $uri->getPassword(),
-        'host' => $uri->getHost(),
-        'port' => $uri->getPort(),
-        'path' => $uri->getPath(),
-        'query' => $uri->getQuery(),
-        'fragment' => $uri->getFragment(),
-    ]);
-}
-
-/**
- * Parsing using Zend\Uri\Uri class
- *
- * @param string $uri The URI to parse
- *
- * @return array
- */
-function testZendUriParser($uri)
-{
-    $uri = new Zend\Uri\Uri($uri);
-    return formatResults([
-        'scheme' => $uri->getScheme(),
-        'userinfo' => $uri->getUserInfo(),
-        'host' => $uri->getHost(),
-        'port' => $uri->getPort(),
-        'path' => $uri->getPath(),
-        'query' => $uri->getQuery(),
-        'fragment' => $uri->getFragment(),
-    ]);
-}
-
-/**
- * Parsing using Riimu\Kit\UrlParser\UriParser class
- *
- * @param string $uri The URI to parse
- *
- * @return array
- */
-function testRiimuUrlParser($uri)
-{
-    $uriParser = new Riimu\Kit\UrlParser\UriParser();
-    $uriParser->setMode(Riimu\Kit\UrlParser\UriParser::MODE_IDNA2003);
-    $uri = $uriParser->parse($uri);
-    if (null === $uri) {
-        throw new RuntimeException('`Riimu\Kit\UrlParser\UriParser::parse` returns `null`');
-    }
-
-    return formatResults([
-        'scheme' => $uri->getScheme(),
-        'userinfo' => $uri->getUserInfo(),
-        'host' => $uri->getHost(),
-        'port' => $uri->getPort(),
-        'path' => $uri->getPath(),
-        'query' => $uri->getQuery(),
-        'fragment' => $uri->getFragment(),
-    ]);
-}
-
-/**
- * Parsing using PHP's native parse_url function
- *
- * @param string $uri The URI to parse
- *
- * @return array
- */
-function testNativeParseUrlFunction($uri)
-{
-    return formatResults(parse_url($uri));
-}
-
-$parserList = [
-    'native' => ['name' => 'parse_url', 'test' => 'testNativeParseUrlFunction'],
-    'league' => ['name' => 'League\Uri\UriParser', 'test' => 'testLeagueUriParser'],
-    'zend' => ['name' => 'Zend\Uri\Uri', 'test' => 'testZendUriParser'],
-    'pear' => ['name' => 'Net_URL2', 'test' => 'testPearParser'],
-    'riimu' => ['name' => 'Riimu\Kit\UrlParser\UriParser', 'test' => 'testRiimuUrlParser'],
-];
+require __DIR__.'/common.php';
 
 $opts = filter_var_array(
     array_replace(
-        ['parser' => 'native', 'uri' => ''],
+        [
+            'parser' => 'native',
+            'uri' => ''
+        ],
         getopt("", ['parser::', 'uri::', 'help'])
     ),
     [
-        'parser' => [
-            'filter' => FILTER_VALIDATE_REGEXP,
-            'options' => [
-                'regexp' => '/^(league|native|zend|riimu|pear)$/',
-                'default' => 'native'
-            ],
-        ],
+        'parser' => $drivers->collectionFilter(),
         'uri' => FILTER_UNSAFE_RAW,
         'help' => FILTER_VALIDATE_BOOLEAN,
     ]
 );
 
-$yellow = chr(27)."[33m";
-$green  = chr(27)."[32m";
-$cyan   = chr(27)."[36m";
-$reset  = chr(27)."[0m";
-$redbg  = chr(27)."[41m";
 if (isset($opts['help'])) {
     $script = basename(__FILE__);
     $text = <<<EOF
@@ -175,31 +29,30 @@ Simple Usage:
 
 $yellow php $script --parser=native --uri=http://example.com $reset
 
-$green--parser$reset select the parser to be use: {$green}pear{$reset}, {$green}riimu{$reset}, {$green}zend{$reset}, {$green}league{$reset}, {$green}native{$reset} ({$yellow}default:$reset native)
-$green--uri$reset    submit your own uri ({$yellow}default:$reset internal uri given)
+$green--parser$reset select the parser to be use: {$green}pear{$reset}, {$green}riimu{$reset}, {$green}zend{$reset}, {$green}league{$reset}, {$green}native{$reset} ({$yellow}default:{$reset} native)
+$green--uri$reset    submit your own uri ({$yellow}default:{$reset} $uri)
 $green--help$reset   show the following help message
 EOF;
     echo $text, PHP_EOL;
     die(0);
 }
 
-$uri = 'ftp://cnn.example.com&story=breaking_news:pass@10.0.0.1/top_story.htm?q=v&q=b#~toto';
 if (isset($opts['uri']) && !empty($opts['uri'])) {
     $uri = $opts['uri'];
 }
 
+$parser = $drivers->get($opts['parser']);
+
 echo PHP_EOL."Results from parsing ".$yellow.$uri.$reset.PHP_EOL;
-$parser = $parserList[$opts['parser']];
-echo "Using  ".$green.$parser['name'].$reset.PHP_EOL;
-$method = $parser['test'];
+echo "Using  ".$green.$parser->getParserName().$reset.PHP_EOL;
 try {
-    print_r($method($uri));
+    print_r($parser->parse($uri));
     die(0);
 } catch (Exception $e) {
     $text = <<<EOF
 
 The submitted uri $yellow{$uri}$reset could not be parse by $green{$parser['name']}$reset
-The Parser issue the following error: 
+The Parser issue the following error:
 
 $redbg {$e->getMessage()} $reset
 

@@ -12,6 +12,11 @@
             "role": "Developer"
         }
     ],
+    "autoload": {
+        "psr-4" : {
+            "UriParsers\\Benchmarks\\" : "src"
+        }
+    },
     "require": {
         "zendframework/zend-uri": "^2.5",
         "league/uri": "^4.0",

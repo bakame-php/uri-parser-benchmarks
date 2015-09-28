@@ -33,7 +33,7 @@ And of course
 
 All URI Parser packages are managed by composer. The tests are runned with the latest stable version
 
-[**See the latest benchmark on Travis-CI**](https://travis-ci.org/nyamsprod/ur-parser-benchmarks)
+[**See the latest benchmark on Travis-CI**](https://travis-ci.org/nyamsprod/uri-parser-benchmarks)
 
 System Requirements
 -------
@@ -80,7 +80,7 @@ You can of course change the parser by providing the parser "nickname".
 
 - *native* : `parse_url`
 - *league* : `League\Uri\UriParser`
-- *pear*   : `Net_URL2` 
+- *pear*   : `Net_URL2`
 - *zend*   : `Zend\Uri\Uri`
 - *riimu*  : `Riimu\Kit\UrlParser\UriParser`
 
